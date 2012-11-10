@@ -2,7 +2,7 @@
 chdir('..');
 include_once '../src/Epi.php';
 Epi::setPath('base', '../src');
-Epi::setPath('config', dirname(__FILE__));
+Epi::setPath('config', __DIR__);
 Epi::init('route');
 
 /*
