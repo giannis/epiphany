@@ -130,7 +130,7 @@ class EpiRoute
       $httpMethod = $_SERVER['REQUEST_METHOD'];
     $routeDef = $this->getRoute($route, $httpMethod);
 
-    $response = call_user_func_array($routeDef['callback'], $routeDef['args']);
+    $response = call_user_func($routeDef['callback'], $routeDef['args']);
     if(!$routeDef['postprocess'])
       return $response;
     else
@@ -156,13 +156,13 @@ class EpiRoute
   public function getRoute($route = false, $httpMethod = null)
   {
     if($route)
-      $this->route = $route;
+      $this->route = rtrim($route, "/");
     else
       $this->route = isset($_GET[self::routeKey]) ? $_GET[self::routeKey] : '/';
 
     if($httpMethod === null)
       $httpMethod = $_SERVER['REQUEST_METHOD'];
-
+  
     foreach($this->regexes as $ind => $regex)
     {
       if(preg_match($regex, $this->route, $arguments))
@@ -191,7 +191,18 @@ class EpiRoute
     }
     EpiException::raise(new EpiException("Could not find route {$this->route} from {$_SERVER['REQUEST_URI']}"));
   }
-
+  
+  public function invoke($route, $httpMethod = EpiRoute::httpGet, $params = array())
+  {
+    $routeDef = $this->getRoute($route, $httpMethod);
+    
+    $routeDef['args'] = array_merge($routeDef['args'], $params);
+   
+    $retval = call_user_func($routeDef['callback'], $routeDef['args']);
+    
+    return $retval;
+  }
+  
   /**
    * EpiRoute::redirect($url); 
    * @name  redirect
@@ -244,6 +255,7 @@ class EpiRoute
    */
   private function addRoute($route, $callback, $method, $postprocess = false)
   {
+    $route = rtrim($route, "/");
     $this->routes[] = array('httpMethod' => $method, 'path' => $route, 'callback' => $callback, 'postprocess' => $postprocess);
     $this->regexes[]= "#^{$route}\$#";
     if(Epi::getSetting('debug'))
