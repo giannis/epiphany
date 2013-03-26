@@ -130,7 +130,7 @@ class EpiRoute
       $httpMethod = $_SERVER['REQUEST_METHOD'];
     $routeDef = $this->getRoute($route, $httpMethod);
 
-    $response = call_user_func($routeDef['callback'], $routeDef['args']);
+    $response = call_user_func_array($routeDef['callback'], $routeDef['args']);
     if(!$routeDef['postprocess'])
       return $response;
     else
@@ -202,7 +202,7 @@ class EpiRoute
       $GLOBALS[$type] = $value;
     }
     
-    $retval = call_user_func($routeDef['callback'], $routeDef['args']);
+    $retval = call_user_func_array($routeDef['callback'], $routeDef['args']);
     
     // restore sanity
     foreach($tmps as $type => $value)
