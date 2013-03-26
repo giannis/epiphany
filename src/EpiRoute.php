@@ -196,9 +196,17 @@ class EpiRoute
   {
     $routeDef = $this->getRoute($route, $httpMethod);
     
-    $routeDef['args'] = array_merge($routeDef['args'], $params);
-   
+    $tmps = array();
+    foreach($params as $type => $value) {
+      $tmps[$type] = $GLOBALS[$type];
+      $GLOBALS[$type] = $value;
+    }
+    
     $retval = call_user_func($routeDef['callback'], $routeDef['args']);
+    
+    // restore sanity
+    foreach($tmps as $type => $value)
+      $GLOBALS[$type] = $value; 
     
     return $retval;
   }
