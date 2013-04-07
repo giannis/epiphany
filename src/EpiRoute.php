@@ -202,11 +202,15 @@ class EpiRoute
       $GLOBALS[$type] = $value;
     }
     
+    $GLOBALS["invoked"] = true;
     $retval = call_user_func_array($routeDef['callback'], $routeDef['args']);
     
     // restore sanity
     foreach($tmps as $type => $value)
       $GLOBALS[$type] = $value; 
+    
+    $GLOBALS["invoked"] = NULL;
+    unset($GLOBALS["invoked"]);
     
     return $retval;
   }
