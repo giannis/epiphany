@@ -92,23 +92,32 @@ class EpiRoute
    * @author  Jaisen Mathai <jaisen@jmathai.com>
    * @param string $file
    */
-  public function load($file)
+  public function load(/*$file, $file, $file, $file...*/)
   {
-    $file = Epi::getPath('config') . DIRECTORY_SEPARATOR . "{$file}";
-    if(!file_exists($file))
+    $args = func_get_args();
+    $confguration = "";
+    foreach ($args as $file) 
     {
-      EpiException::raise(new EpiException("Config file ({$file}) does not exist"));
-      break; // need to simulate same behavior if exceptions are turned off
+        // Prepend config directory if the path doesn't start with . or /
+        if ($file[0] != '.' && $file[0] != DIRECTORY_SEPARATOR)
+            $file = Epi::getPath('config') . DIRECTORY_SEPARATOR . "{$file}";
+
+        if (!file_exists($file)) {
+            EpiException::raise(new EpiConfigException("Config file ({$file}) does not exist"));
+            break; // need to simulate same behavior if exceptions are turned off
+        }
+
+        $confguration .= file_get_contents($file);
     }
 
-    $parsed_array = parse_ini_file($file, true);
-    foreach($parsed_array as $route)
+    $parsed_array = parse_ini_string($confguration, true);
+    foreach ($parsed_array as $route) 
     {
-      $method = strtolower($route['method']);
-      if(isset($route['class']) && isset($route['function']))
-        $this->$method($route['path'], array($route['class'], $route['function']));
-      elseif(isset($route['function']))
-        $this->$method($route['path'], $route['function']);
+        $method = strtolower($route['method']);
+        if (isset($route['class']) && isset($route['function']))
+            $this->$method($route['path'], array($route['class'], $route['function']));
+        elseif (isset($route['function']))
+            $this->$method($route['path'], $route['function']);
     }
   }
   
