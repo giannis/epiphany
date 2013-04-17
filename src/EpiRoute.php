@@ -107,7 +107,7 @@ class EpiRoute
             break; // need to simulate same behavior if exceptions are turned off
         }
 
-        $confguration .= file_get_contents($file);
+        $confguration .= "\n" . file_get_contents($file);
     }
 
     $parsed_array = parse_ini_string($confguration, true);
@@ -188,7 +188,7 @@ class EpiRoute
             getDebug()->addMessage(__CLASS__, sprintf('Matched %s : %s : %s : %s', $httpMethod, $this->route, json_encode($def['callback']), json_encode($arguments)));
           return array('callback' => $def['callback'], 'args' => $arguments, 'postprocess' => $def['postprocess']);
         }
-        else if(function_exists($def['callback']))
+        else if(!is_array($def['callback']) && function_exists($def['callback']))
         {
           if(Epi::getSetting('debug'))
             getDebug()->addMessage(__CLASS__, sprintf('Matched %s : %s : %s : %s', $httpMethod, $this->route, json_encode($def['callback']), json_encode($arguments)));
