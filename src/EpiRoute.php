@@ -139,6 +139,9 @@ class EpiRoute
       $httpMethod = $_SERVER['REQUEST_METHOD'];
     $routeDef = $this->getRoute($route, $httpMethod);
 
+    if (empty($routeDef))
+      error_log('callback does not exist for path:' . $route . ' method: ' . $httpMethod);
+    
     $response = call_user_func_array($routeDef['callback'], $routeDef['args']);
     if(!$routeDef['postprocess'])
       return $response;
@@ -210,6 +213,7 @@ class EpiRoute
   {
     $routeDef = $this->getRoute($route, $httpMethod);
     
+    // this is ugly but required if internal and external calls are to work
     $tmps = array();
     foreach($params as $type => $value) {
       $tmps[$type] = $GLOBALS[$type];
