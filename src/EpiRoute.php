@@ -233,7 +233,8 @@ class EpiRoute
     }
     
     $GLOBALS["invoked"] = true;
-    $retval = call_user_func_array($routeDef['callback'], $routeDef['args']);
+    $handler = call_user_func([$routeDef['callback'][0], 'getInstance']);
+    $retval = call_user_func_array([$handler, $routeDef['callback'][1]], $routeDef['args']);
     
     // restore sanity
     foreach($tmps as $type => $value)
