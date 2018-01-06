@@ -12,6 +12,7 @@ Thumbs.db
 
 # NetBeans project folder
 nbproject
+.idea
 
 *.swp
 *.un~
