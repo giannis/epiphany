@@ -151,9 +151,14 @@ class EpiRoute
 
     if (empty($routeDef))
       error_log('callback does not exist for path:' . $route . ' method: ' . $httpMethod);
-  
-    $handler = call_user_func([$routeDef['callback'][0], 'getInstance']); // i() is not a good name
-    $response = call_user_func_array([$handler, $routeDef['callback'][1]], $routeDef['args']);
+
+    if (method_exists($routeDef['callback'][0], 'getInstance')) {
+      $handler = call_user_func([$routeDef['callback'][0], 'getInstance']);
+      $response = call_user_func_array([$handler, $routeDef['callback'][1]], $routeDef['args']);
+    }
+    else {
+      $response = call_user_func_array($routeDef['callback'], $routeDef['args']);
+    }
 
     if(!$routeDef['postprocess'])
       return $response;
@@ -233,8 +238,13 @@ class EpiRoute
     }
     
     $GLOBALS["invoked"] = true;
-    $handler = call_user_func([$routeDef['callback'][0], 'getInstance']);
-    $retval = call_user_func_array([$handler, $routeDef['callback'][1]], $routeDef['args']);
+    if (method_exists($routeDef['callback'][0], 'getInstance')) {
+      $handler = call_user_func([$routeDef['callback'][0], 'getInstance']);
+      $retval = call_user_func_array([$handler, $routeDef['callback'][1]], $routeDef['args']);
+    }
+    else {
+      $retval = call_user_func_array($routeDef['callback'], $routeDef['args']);
+    }
     
     // restore sanity
     foreach($tmps as $type => $value)
