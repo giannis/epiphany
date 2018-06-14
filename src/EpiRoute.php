@@ -236,7 +236,8 @@ class EpiRoute
       $tmps[$type] = $GLOBALS[$type];
       $GLOBALS[$type] = $value;
     }
-    
+
+    $_REQUEST[static::routeKey] = $route;
     $GLOBALS["invoked"] = true;
     if (method_exists($routeDef['callback'][0], 'getInstance')) {
       $handler = call_user_func([$routeDef['callback'][0], 'getInstance']);
